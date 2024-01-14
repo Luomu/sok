@@ -2,24 +2,25 @@
 # accessible from args.state.company
 class Company
   #attr_accessor :name
-  attr_accessor :level #determines rent
-  attr_accessor :turn
-  attr_accessor :money #could be negative (debt) at start
-  attr_accessor :num_operations #how many combat drops
-  attr_accessor :treasures
-  attr_accessor :team #all soldiers
-  attr_accessor :team_squad
-  attr_accessor :team_reserve
-  attr_accessor :team_hospital
-  attr_accessor :daily_fees # salaries mostly
-  attr_accessor :monthly_fees # rent
-  attr_accessor :monthly_fees_due_days
-  attr_accessor :armor_level  # persistent upgrades
-  attr_accessor :weapon_level # persistent upgrades
-  #todo: reputation
+  attr_accessor :level          # determines rent
+  attr_accessor :reputation     # company 'XP', hidden stat
+  attr_accessor :turn           # game turns (days)
+  attr_accessor :money          # could be negative (debt) at start
+  attr_accessor :num_operations # how many combat drops
+  attr_accessor :treasures      # loot vault
+  attr_accessor :team           # all soldiers
+  attr_accessor :team_squad     # soldiers assigned to squad (4, can have nil slots)
+  attr_accessor :team_reserve   # soldiers in reserve pool
+  attr_accessor :team_hospital  # soldiers being treated in hospital
+  attr_accessor :daily_fees     # salaries mostly
+  attr_accessor :monthly_fees   # rent
+  attr_accessor :monthly_fees_due_days # countdown to rent payment
+  attr_accessor :armor_level    # persistent upgrades
+  attr_accessor :weapon_level   # persistent upgrades
 
   def initialize
     @level = 1
+    @reputation = 0
     @turn  = 0
     @money = Cheats::ULTRA_RICH ? 1000*1000 : STARTING_MONEY
     @num_operations = 0
@@ -37,6 +38,14 @@ class Company
     @team_hospital = []
   end
 
+  def rank
+    return @level
+  end
+
+  def rank= rank
+    @level = rank
+  end
+
   def setup_initial_team!
     @team = generate_team()
     @team_reserve  = []
@@ -49,6 +58,7 @@ class Company
 
   def from_hash hash
     @level          = hash.level
+    @reputation     = hash.reputation
     @turn           = hash.turn
     @money          = hash.money
     @num_operations = hash.num_operations
@@ -91,6 +101,7 @@ class Company
     {
       class:          self.class.name,
       level:          @level,
+      reputation:     @reputation,
       turn:           @turn,
       money:          @money,
       team:           @team,
@@ -116,6 +127,14 @@ class Company
 
   def spend_money sum
     @money -= sum
+  end
+
+  def gain_reputation amount
+    @reputation = (@reputation + amount).clamp(0, MAX_REPUTATION)
+  end
+
+  def lose_reputation amount
+    @reputation = (@reputation - amount).clamp(0, MAX_REPUTATION)
   end
 
   def squad_empty?
