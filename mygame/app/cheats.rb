@@ -14,12 +14,15 @@ end
 
 # Edit these if testing
 if !$gtk.production
-Cheats::DISABLE_MUSIC         = false
-Cheats::DISABLE_SFX           = false
-Cheats::QUICK_ADVENTURE_INTRO = false
-Cheats::QUICK_COMBAT          = false
-Cheats::QUICK_CRAWL           = false
-Cheats::QUICK_MESSAGES        = false
-Cheats::ULTRA_RICH            = false
-Cheats::WEAK_FOES             = false
+  cfg = $gtk.parse_json_file "cheat.json"
+  if cfg
+    Cheats::DISABLE_MUSIC         = cfg.fetch('disable_music', false)
+    Cheats::DISABLE_SFX           = cfg.fetch('disable_sfx', false)
+    Cheats::QUICK_ADVENTURE_INTRO = cfg.fetch('quick_adventure_intro', false)
+    Cheats::QUICK_COMBAT          = cfg.fetch('quick_combat', false)
+    Cheats::QUICK_CRAWL           = cfg.fetch('quick_crawl', false)
+    Cheats::QUICK_MESSAGES        = cfg.fetch('quick_messages', false)
+    Cheats::ULTRA_RICH            = cfg.fetch('ultra_rich', false)
+    Cheats::WEAK_FOES             = cfg.fetch('weak_foes', false)
+  end
 end

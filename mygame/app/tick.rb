@@ -16,6 +16,9 @@ def initialize_saved_game args
 end
 
 def tick args
+  # Uncomment if hunting for puts source
+  # $gtk.add_caller_to_puts!
+
   if !$init_done
     $game_events.clear()
     if !$gtk.production
