@@ -83,6 +83,7 @@ class CoreFsm < Fsm
 
   def save_game payload
     slot_idx = $state.save_slot_idx
+    $gtk.args.state.save_version = SAVEGAME_VERSION
     if slot_idx
       $gtk.serialize_state("#{SAVE_DIR}/savegame#{slot_idx}.txt", $gtk.args.state)
       # Strategy.eventbus.publish(Events::GAME_SAVED, ...)
