@@ -231,13 +231,29 @@ class GameState_Strategy < FsmState
 
   def on_return_from_mission args
     return unless args.state.mission
-    args.state.mission = nil
+
+    # There should always be a result... except when cheating
+    result = args.state.mission_result
+    if !result
+      result = {
+        success:    false,
+        loot:       [],
+        money:      0,
+        reputation: 0
+      }
+    end
 
     company = args.state.company
+    starting_rep = company.reputation
+    company.gain_money(result.money)
+    company.num_operations += 1
+    company.treasures      += result.loot
+    company.gain_reputation(result.reputation)
 
     # Remove dead soldiers from the team
     company.team.reverse.each do |soldier|
       if not soldier.alive?
+        company.lose_reputation(Rules.calculate_reputation_penalty_for_dead_soldier(soldier))
         company.kill_soldier(soldier)
         @messages.queue_message("#{soldier.firstname} has been killed in action")
       end
@@ -256,6 +272,19 @@ class GameState_Strategy < FsmState
         company.assign_soldier_to_hospital(soldier)
         @messages.queue_message("#{soldier.firstname} has been hospitalized")
       end
+    end
+
+    args.state.mission        = nil
+    args.state.mission_result = nil
+
+    # Level up/down, depending on reputation
+    # This should perhaps be limited to every week/month?
+    old_rank = company.rank
+    company.rank = Rules.calculate_rank_for_reputation(company.reputation)
+    if company.rank > old_rank
+      @messages.queue_message("Our standing has increased")
+    elsif company.rank < old_rank
+      @messages.queue_message("Our standing has decreased")
     end
 
     # Finally, autosave, if autosave has been enabled

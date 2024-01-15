@@ -12,6 +12,33 @@ module Rules
     return science_bonus, security_bonus
   end
 
+  def Rules.calculate_mission_reputation_gain adventure
+    rep = 0
+    rep += adventure.stat_checkpoints_reached * 10
+    rep += adventure.stat_enemies_killed * 1
+    # loot gives rep when sold
+    return rep
+  end
+
+  def Rules.calculate_reputation_penalty_for_dead_soldier soldier
+    return 30 # Should depend on soldier's rank
+  end
+
+  # Company rank can go up and down
+  def Rules.calculate_rank_for_reputation reputation
+    if reputation >= 3000
+      return 5
+    elsif reputation >= 2000
+      return 4
+    elsif reputation >= 1000
+      return 3
+    elsif reputation >= 500
+      return 2
+    else
+      return 1
+    end
+  end
+
   # Calculate daily expenses (salaries)
   def Rules.calculate_daily_fees company
     expenses = 0

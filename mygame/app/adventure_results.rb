@@ -37,17 +37,22 @@ module Adventure
     end
 
     def on_enter args
+      # mission_result is parsed in strategy.rb for better presentation
+      result = args.state.mission_result ||= {}
       # If everyone's dead, this is a loss
       is_failed = @adventure.party_dead?
       # Money is gained regardless of win/loss
       science_bonus, security_bonus = Rules.calculate_mission_bonus(@adventure)
-      args.state.company.gain_money(science_bonus + security_bonus)
-      args.state.company.num_operations += 1
+      result.success    = !is_failed
+      result.money      = science_bonus + security_bonus
+      result.reputation = Rules.calculate_mission_reputation_gain(@adventure)
+
       # only keep treasures if party survived
-      kept_loot_display = []
+      result.loot       = []
+      kept_loot_display = [] # names only
       if !is_failed
         @adventure.collected_loot.each do |treasure|
-          args.state.company.treasures << treasure
+          result.loot       << treasure
           kept_loot_display << treasure.name
         end
       end

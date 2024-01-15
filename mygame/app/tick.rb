@@ -24,8 +24,8 @@ def tick args
     if !$gtk.production
       # Register dice roll logger
       # Only once per app lifetime
-      $dice_logger ||= Debug::DiceLogger.new
-      $dice_logger.hook()
+      # $dice_logger ||= Debug::DiceLogger.new
+      # $dice_logger.hook()
     end
     $init_done = true
     $core_fsm  = CoreFsm.new
