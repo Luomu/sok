@@ -6,6 +6,8 @@ def initialize_new_game args, quickstart = true
   args.state.company  = Company.new()
   args.state.missions = []
   args.state.available_soldiers = []
+  # Used to produce the weekly report
+  args.state.weekly_data = Strategy::init_weekly_stats()
   if quickstart
     args.state.company.setup_initial_team!
   end

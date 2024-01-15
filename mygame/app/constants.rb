@@ -112,6 +112,8 @@ COLOR_DEFENSE = COLOR_BLUE_P8
 
 # Known event symbols
 module Events
+  TURN_ENDED            = :event_turn_ended
+
   ENABLE_AUTOSAVE       = :event_enable_autosave
   AUTOSAVE              = :event_autosave
   ENTER_STRATEGY        = :event_enter_strategy
@@ -126,6 +128,11 @@ module Events
   EXIT_LOOT  = :event_exit_loot
 
   MESSAGE    = :event_message
+
+  SPEND_MONEY     = :event_spend_money
+  GAIN_MONEY      = :event_gain_money
+  GAIN_REPUTATION = :event_gain_reputation
+  LOSE_REPUTATION = :event_lose_reputation
 end
 
 # Balancing data

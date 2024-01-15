@@ -123,18 +123,28 @@ class Company
 
   def gain_money sum
     @money += sum
+    Strategy.eventbus.publish(Events::GAIN_MONEY, sum)
   end
 
   def spend_money sum
     @money -= sum
+    Strategy.eventbus.publish(Events::SPEND_MONEY, sum)
   end
 
   def gain_reputation amount
+    rep_before = @reputation
     @reputation = (@reputation + amount).clamp(0, MAX_REPUTATION)
+    if @reputation != rep_before
+      Strategy.eventbus.publish(Events::GAIN_REPUTATION, amount)
+    end
   end
 
   def lose_reputation amount
+    rep_before = @reputation
     @reputation = (@reputation - amount).clamp(0, MAX_REPUTATION)
+    if @reputation != rep_before
+      Strategy.eventbus.publish(Events::LOSE_REPUTATION, amount)
+    end
   end
 
   def squad_empty?

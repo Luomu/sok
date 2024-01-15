@@ -19,6 +19,7 @@ require 'app/strategy_screens.rb'
 require 'app/strategy_screens_treasure.rb'
 require 'app/strategy_screens_shop.rb'
 require 'app/strategy_screens_system.rb'
+require 'app/strategy_evaluation.rb'
 
 # Event bus + misc constants for the strategy mode
 module Strategy
@@ -126,6 +127,7 @@ class GameState_Strategy < FsmState
     Strategy.initialize()
     @messages = MessageLog.new()
     @messages.set_ypos(Strategy::MESSAGEWINDOW_YPOS)
+    @stat_tracker = Strategy::CompanyStatsTracker.new()
     if args.state.company.turn == 0
       start_new_turn(args)
     else
@@ -202,6 +204,9 @@ class GameState_Strategy < FsmState
         Strategy.eventbus.publish(:strategy_soldier_healed, soldier)
       end
     end
+
+    Strategy.eventbus.publish(Events::TURN_ENDED, nil)
+    @stat_tracker.trigger_evaluation()
 
     start_new_turn(args)
     @messages.queue_message("A day has passed")
