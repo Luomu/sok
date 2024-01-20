@@ -36,7 +36,7 @@ class GameState_Results < FsmState
     treasures_cr  = calculate_treasures_value(args)
     final_credits = starting_cr + treasures_cr
     final_rating  = calculate_rating(final_credits)
-    fav_soldier   = company.get_favorite_soldier().fullname
+    fav_soldier   = company.get_favorite_soldier()&.fullname
     @timer        = 0
 
     @model = {
@@ -68,7 +68,9 @@ class GameState_Results < FsmState
     Gui.label("Missions: #{@model.num_operations}")
     Gui.label("Treasures gathered: #{@model.treasures}")
     Gui.label("Profit: #{@model.final_credits} Cr")
-    Gui.label("Star employee: #{@model.favourite_soldier}")
+    if @model.favourite_soldier
+      Gui.label("Star employee: #{@model.favourite_soldier}")
+    end
     Gui.label("")
     Gui.label("See you next time!")
     Gui.end_window()

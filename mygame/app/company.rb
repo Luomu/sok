@@ -254,6 +254,7 @@ class Company
   end
 
   def get_favorite_soldier
+    return nil if team.empty?
     # Determine highest drop count
     max_missions = team.max_by {|soldier| soldier.missions }.missions
 
