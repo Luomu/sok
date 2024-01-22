@@ -58,6 +58,8 @@ class StationAmbience
   end
 
   def update args
+    return if Cheats::DISABLE_SFX
+
     @cooldown_ann -= 1
     if @cooldown_ann <= 0
       args.audio[:amb_announcement] = { input: get_announcement(), pitch: get_pitch(), gain: get_gain() }
