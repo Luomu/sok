@@ -22,20 +22,22 @@ def tick args
   # $gtk.add_caller_to_puts!
 
   if !$init_done
-    $game_events.clear()
+    $init_done = true
+    # Global event bus (cleared upon reset)
+    # Can be used for messages that are not limited to just the Strategy or Adventure modes
+    $game_events = EventBus.new()
     if !$gtk.production
       # Register dice roll logger
       # Only once per app lifetime
       # $dice_logger ||= Debug::DiceLogger.new
       # $dice_logger.hook()
     end
-    $init_done = true
     $core_fsm  = CoreFsm.new
     Input.initialize(args)
     Gui.initialize(args)
     ScreenManager.initialize(args)
     Music.initialize(args)
-    initialize_new_game(args) #only initialized here for testing
+    initialize_new_game(args) # initialized here for testing, normally through main menu
   end
 
   #Quick restart

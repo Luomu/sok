@@ -32,7 +32,3 @@ class EventBus
     @listeners.clear()
   end
 end
-
-# Global event bus (cleared upon reset)
-# Can be used for messages that are not limited to just the Strategy or Adventure modes
-$game_events = EventBus.new()
