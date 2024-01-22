@@ -1,5 +1,7 @@
 # immediate mode menu layout
 module Gui
+  ERR_NO_CURR_WINDOW = "No current window set - missing begin?"
+
   class Point
     attr_accessor :x
     attr_accessor :y
@@ -264,9 +266,7 @@ module Gui
   # End a menu window - must be matched by begin_menu
   # Returns the highlighted option index, if any
   def Gui.end_menu
-    if !@@ctx.current_window
-      raise "No current window set - missing begin_menu?"
-    end
+    raise ERR_NO_CURR_WINDOW unless @@ctx.current_window
 
     #resize menu to fit contents
 
@@ -302,9 +302,7 @@ module Gui
   # Define a selectable menu option
   def Gui.menu_option title
     window = @@ctx.current_window
-    if !window
-      raise "No current window set"
-    end
+    raise ERR_NO_CURR_WINDOW unless window
 
     # add a label draw command
     cursor = window.get_cursor_pos
@@ -349,7 +347,7 @@ module Gui
 
   def Gui.label title
     window = @@ctx.current_window
-    raise "No current window set" unless window
+    raise ERR_NO_CURR_WINDOW unless window
 
     cursor = window.get_cursor_pos
     window.draw_list.add_label(title, cursor.x, cursor.y)
@@ -370,7 +368,7 @@ module Gui
   # A label, but bigger
   def Gui.header title
     window = @@ctx.current_window
-    raise "No current window set" unless window
+    raise ERR_NO_CURR_WINDOW unless window
 
     cursor = window.get_cursor_pos
     window.draw_list.add_label(title, cursor.x, cursor.y, TEXT_SIZE_HEADER)
@@ -400,7 +398,7 @@ module Gui
 
   def Gui.image image_path, w = 128, h = 128
     window = @@ctx.current_window
-    raise "No current window set" unless window
+    raise ERR_NO_CURR_WINDOW unless window
 
     cursor = window.get_cursor_pos
     window.draw_list.add_image(image_path, cursor.x, cursor.y - h, w, h)
@@ -416,7 +414,7 @@ module Gui
   # Special character image
   def Gui.portrait character
     window = @@ctx.current_window
-    raise "No current window set" unless window
+    raise ERR_NO_CURR_WINDOW unless window
 
     cursor = window.get_cursor_pos
     # This adds multiple overlapping prims to the list
@@ -482,7 +480,7 @@ module Gui
   # last end() unsets the column mode
   def Gui.set_columns num_col
     window = @@ctx.current_window
-    raise "No current window set" unless window
+    raise ERR_NO_CURR_WINDOW unless window
     raise "Already in column mode?" if @@ctx.num_columns > 0
     @@ctx.num_columns    = num_col
     @@ctx.current_column = 0
@@ -492,9 +490,9 @@ module Gui
 
   def Gui.begin_column width = 100
     window = @@ctx.current_window
+    raise ERR_NO_CURR_WINDOW unless window
     cursor = window.get_cursor_pos
     @@ctx.current_column += 1
-    raise "No current window set" unless window
     raise "Unexpected column count" if @@ctx.current_column > @@ctx.num_columns
     # First column, save Y
     if @@ctx.current_column == 1
@@ -508,8 +506,8 @@ module Gui
 
   def Gui.end_column
     window = @@ctx.current_window
+    raise ERR_NO_CURR_WINDOW unless window
     cursor = window.get_cursor_pos
-    raise "No current window set" unless window
     raise "No column active" if @@ctx.current_column <= 0
     @@ctx.tallest_column = [@@ctx.tallest_column, cursor.y].min()
     if @@ctx.current_column == @@ctx.num_columns
@@ -542,7 +540,7 @@ module Gui
   end
 
   def Gui.highlighted_option_index
-    raise "No current window set" unless @@ctx.current_window
+    raise ERR_NO_CURR_WINDOW unless @@ctx.current_window
     @@ctx.current_window.current_selection
   end
 
