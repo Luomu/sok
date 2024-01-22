@@ -44,15 +44,19 @@ module Gui
     end
   end
 
+  CustomElement = Struct.new(:x, :y, :w, :h, :draw_func, :draw_data)
+
   # A Window's draw list for frames, images and labels
   class WindowDrawList
     attr_accessor :labels
     attr_accessor :images
     attr_accessor :primitives
+    attr_accessor :custom_elements
     def initialize
       @labels     = []
       @images     = []
       @primitives = []
+      @custom_elements = []
     end
 
     def add_label text, x, y, size = TEXT_SIZE_LABEL
@@ -67,10 +71,15 @@ module Gui
       @primitives << prim
     end
 
+    def add_custom_element x, y, w, h, draw_func, draw_data
+      @custom_elements << CustomElement.new(x, y, w, h, draw_func, draw_data)
+    end
+
     def reset
       @labels.clear()
       @images.clear()
       @primitives.clear()
+      @custom_elements.clear()
     end
   end
 
@@ -156,6 +165,20 @@ module Gui
 
     def unset_flag flag
       @flags = @flags & ~flag
+    end
+
+    # Expand the window, if necessary
+    def allocate_rectangle w, h
+      cursor = get_cursor_pos()
+      x = cursor.x
+      y = cursor.y
+      # this part is probably wrong
+      if !has_flag?(WINDOWFLAG_FIXED_SIZE)
+        self.width  = w + 32
+        self.height = h + 32
+      end
+      cursor.y -= h
+      return x, y
     end
   end
 
@@ -386,16 +409,6 @@ module Gui
     window.set_cursor_pos(cursor.x, cursor.y - text_size[1])
   end
 
-  # Returns true if cancel button was pressed in the currently
-  # active menu (must be between menu begin/end)
-  #def Gui.menu_canceled
-  #  if @@ctx.current_window
-  #    return @@ctx.current_window.is_canceled
-  #  else
-  #    raise "No active window - menu_canceled should be between begin/end"
-  #  end
-  #end
-
   def Gui.image image_path, w = 128, h = 128
     window = @@ctx.current_window
     raise ERR_NO_CURR_WINDOW unless window
@@ -409,6 +422,17 @@ module Gui
     end
 
     cursor.y -= h + @@ctx.padding
+  end
+
+  # Layout element with a custom draw callback
+  # Reserves a rectangle at current cursor pos and
+  # calls draw_func(args, x, y, w, h, data) when rendering
+  # data is an optional payload Hash
+  def Gui.draw_custom w, h, draw_func, data = {}
+    window = @@ctx.current_window
+    raise ERR_NO_CURR_WINDOW unless window
+    x, y = window.allocate_rectangle(w, h)
+    window.draw_list.add_custom_element(x, y - h, w, h, draw_func, data)
   end
 
   # Special character image
@@ -622,6 +646,9 @@ module Gui
         prim.x += w.x
         prim.y += w.y
         args.outputs.primitives << prim
+      end
+      w.draw_list.custom_elements.each do |e|
+        e.draw_func.call(args, w.x + e.x, w.y + e.y, e.w, e.h, e.draw_data)
       end
       w.draw_list.reset()
     end

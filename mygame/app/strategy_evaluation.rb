@@ -87,6 +87,11 @@ module Strategy
       Strategy.eventbus.publish(Events::ENTER_SHOP)
     end
 
+    def draw_func args, x, y, w, h, data = nil
+      Rendering.set_color(COLOR_ORANGE_P8)
+      Rendering.rectangle(x, y, w, h)
+    end
+
     def on_update args
       Gui.set_next_window_size(800, 500)
       Gui.begin_window("weekly_screen")
@@ -95,6 +100,7 @@ module Strategy
       Gui.label("Cr spent: #{@model.money_spend}")
       Gui.label("Revenue: #{@model.profit}")
       Gui.label("You did good.")
+      Gui.draw_custom(200, 100, method(:draw_func))
       Gui.label("Employees love you.")
       Gui.end_window()
     end
