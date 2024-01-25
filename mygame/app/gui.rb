@@ -204,8 +204,8 @@ module Gui
     return @@ctx
   end
 
-  # Begin a menu window - must be matched by end_menu
-  def Gui.begin_menu title, x = 0, y = 0
+  # Begin a menu window - must be matched by end_window
+  def Gui.begin_window title, x = 0, y = 0
     ctx         = @@ctx
     window      = ctx.find_window(title)
     ctx.padding = ctx.next_window_padding ? ctx.next_window_padding : WINDOW_PADDING
@@ -255,9 +255,9 @@ module Gui
     window.set_cursor_pos(ctx.padding, -ctx.padding)
   end
 
-  # End a menu window - must be matched by begin_menu
+  # End a menu window - must be matched by begin_window
   # Returns the highlighted option index, if any
-  def Gui.end_menu
+  def Gui.end_window
     raise ERR_NO_CURR_WINDOW unless @@ctx.current_window
     w = @@ctx.current_window
 
@@ -287,15 +287,7 @@ module Gui
     return w.current_selection
   end
 
-  def Gui.begin_window unique_id
-    Gui.begin_menu(unique_id)
-  end
-
-  def Gui.end_window
-    Gui.end_menu()
-  end
-
-  # Define a selectable menu option
+  # Define a selectable menu option in the current window
   def Gui.menu_option title
     window = @@ctx.current_window
     raise ERR_NO_CURR_WINDOW unless window
@@ -422,7 +414,7 @@ module Gui
   # The box is always centered horizontally.
   def Gui.talkbox window_id, portrait, text, ypos = DIALOGUE_DEFAULT_POS
     Gui.set_next_window_flags(WINDOWFLAG_CENTER_X)
-    Gui.begin_menu("Talkbox#{window_id}", 240, ypos)
+    Gui.begin_window("Talkbox#{window_id}", 240, ypos)
     window = @@ctx.current_window
     cursor = window.get_cursor_pos
     if portrait
@@ -445,13 +437,13 @@ module Gui
     if window.height < min_height
       window.height = min_height
     end
-    Gui.end_menu()
+    Gui.end_window()
   end
 
   # Has an image and one multiline text label
   # Bit like talkbox except the size is fixed
   def Gui.item_preview_window window_id, image, text
-    Gui.begin_menu("preview#{window_id}", 200, 200)
+    Gui.begin_window("preview#{window_id}", 200, 200)
 
     window    = @@ctx.current_window
     cursor    = window.get_cursor_pos
@@ -462,7 +454,7 @@ module Gui
       cursor.y -= text_size[1]
     end
 
-    Gui.end_menu()
+    Gui.end_window()
   end
 
   # Call this before begin/end column pairs to enable column mode
@@ -581,12 +573,12 @@ module Gui
     ctx = @@ctx
 
     if ctx.current_window
-      raise "Current window still set - mismatched begin_menu/end_menu?"
+      raise "Current window still set - mismatched begin_window/end_window?"
     end
 
     ctx.windows.delete_if {|w| !w.is_alive }
     ctx.windows.each do |w|
-      w.is_alive = false #dies next frame unless refreshed on begin_menu
+      w.is_alive = false #dies next frame unless refreshed on begin_window
     end
   end
 

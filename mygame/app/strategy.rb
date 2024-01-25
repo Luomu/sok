@@ -71,14 +71,14 @@ class GameState_Strategy < FsmState
     def on_update args
       # Flavour image for the current subscreen
       #Gui.set_next_window_pos(100, 64.from_top)
-      #Gui.begin_menu("station_window")
+      #Gui.begin_window("station_window")
       #Gui.image(@scene_image, 256, 256)
-      #Gui.end_menu()
+      #Gui.end_window()
 
       # Options to navigate between station screens
       Gui.set_next_window_flags(0)
       Gui.set_next_window_pos(332, 40.from_top)
-      Gui.begin_menu("station_window_2")
+      Gui.begin_window("station_window_2")
       Gui.header("STATION")
       @options.each do |option|
         Gui.menu_option_call(option[0], option[1])
@@ -89,7 +89,7 @@ class GameState_Strategy < FsmState
         @selected_option = Gui.highlighted_option_index
       end
 
-      Gui.end_menu()
+      Gui.end_window()
     end
 
     def set_scene scene

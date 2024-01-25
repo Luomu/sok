@@ -36,9 +36,9 @@ module Adventure
       @timer += 1
       # Image
       Gui.set_next_window_flags(WINDOWFLAG_CENTER_X)
-      Gui.begin_menu("situation_image", 0, 100.from_top)
+      Gui.begin_window("situation_image", 0, 100.from_top)
       Gui.image(@situation_image, 256, 256)
-      Gui.end_menu()
+      Gui.end_window()
 
       # Wait a moment to avoid accidental choice
       return unless @timer > 30
@@ -67,7 +67,7 @@ module Adventure
       elsif @state == STATE_CHOICE
         # Present choices
         Gui.set_next_window_flags(WINDOWFLAG_CENTER_X)
-        Gui.begin_menu("choicebox", 640, 300)
+        Gui.begin_window("choicebox", 640, 300)
         Gui.label(@option_prompt)
         @options.each do |option|
           if Gui.menu_option(option.text)
@@ -89,7 +89,7 @@ module Adventure
             @state = STATE_OUTCOME
           end
         end
-        Gui.end_menu()
+        Gui.end_window()
       elsif @state == STATE_OUTCOME
         # Play the result text, after that exit the event
         if @dialogue.waiting_for_input?

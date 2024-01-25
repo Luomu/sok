@@ -100,7 +100,7 @@ class ConfirmationDialog < Screen
   end
 
   def on_update args
-    Gui.begin_menu(@lines[0])
+    Gui.begin_window(@lines[0])
     @lines.each do |l|
       Gui.label(l)
     end
@@ -112,7 +112,7 @@ class ConfirmationDialog < Screen
       Sound.menu_cancel()
       close(@on_no)
     end
-    Gui.end_menu()
+    Gui.end_window()
   end
 end
 

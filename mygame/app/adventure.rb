@@ -266,13 +266,13 @@ module Adventure
 
     def on_update args
       Gui.set_next_window_flags(WINDOWFLAG_CENTER_X)
-      Gui.begin_menu("situation_image", 0, 64.from_top)
+      Gui.begin_window("situation_image", 0, 64.from_top)
       if @timer > 140
         Gui.image("sprites/image/image-soldiers01.png", 256, 256)
       else
         Gui.image("sprites/image/image-boarding.png", 256, 256)
       end
-      Gui.end_menu()
+      Gui.end_window()
 
       if @timer > 50
         @dialogue.update(args)
