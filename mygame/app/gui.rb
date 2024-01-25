@@ -2,48 +2,10 @@
 module Gui
   ERR_NO_CURR_WINDOW = "No current window set - missing begin?"
 
-  class Point
-    attr_accessor :x
-    attr_accessor :y
-
-    def initialize x_, y_
-      @x = x_
-      @y = y_
-    end
-  end
-
-  #Text element
-  class Label
-    attr_reader :x
-    attr_reader :y
-    attr_reader :text
-    attr_reader :size
-
-    def initialize text_, x_, y_, size_
-      @x = x_
-      @y = y_
-      @text = text_
-      @size = size_
-    end
-  end
-
-  # Image element
-  class Image
-    attr_reader :x
-    attr_reader :y
-    attr_reader :w
-    attr_reader :h
-    attr_reader :path
-
-    def initialize path_, x_, y_, w_, h_
-      @x = x_
-      @y = y_
-      @w = w_
-      @h = h_
-      @path = path_
-    end
-  end
-
+  # Internal data structures
+  Point         = Struct.new(:x, :y)
+  Label         = Struct.new(:text, :x, :y, :size)
+  Image         = Struct.new(:path, :x, :y, :w, :h)
   CustomElement = Struct.new(:x, :y, :w, :h, :draw_func, :draw_data)
 
   # A Window's draw list for frames, images and labels
