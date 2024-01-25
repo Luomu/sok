@@ -3,6 +3,7 @@ module Gui
   ERR_NO_CURR_WINDOW = "No current window set - missing begin?"
   WINDOW_TINT        = [50, 60, 70]
   SPACING_RECTS      = 8 # vertical spacing added after non-text elements
+  SPACING_LABELS     = 2 # vertical spacing added after text
 
   # Internal data structures
   Point         = Struct.new(:x, :y)
@@ -303,15 +304,15 @@ module Gui
     window.num_options += 1
 
     #Expand window
-    text_size = $gtk.calcstringbox(title, TEXT_SIZE_LABEL, FONT_DEFAULT)
+    label_w, label_h = $gtk.calcstringbox(title, TEXT_SIZE_LABEL, FONT_DEFAULT)
     if !window.has_flag?(WINDOWFLAG_FIXED_SIZE)
-      if window.width < (text_size[0] + 32)
-        window.width = text_size[0] + 32
-      end
-      window.height += text_size[1]
+      right  = cursor.x  + label_w
+      bottom = -cursor.y + label_h # cursor coords go "down"
+      window.width  = window.width.greater(right)
+      window.height = window.height.greater(bottom)
     end
 
-    window.set_cursor_pos(cursor.x, cursor.y - text_size[1])
+    window.set_cursor_pos(cursor.x, cursor.y - label_h - SPACING_LABELS)
 
     # Return true (once) if this menu option was confirmed
     if window.is_confirmed && is_current_selection
@@ -349,7 +350,7 @@ module Gui
       window.height += text_size[1]
     end
 
-    window.set_cursor_pos(cursor.x, cursor.y - text_size[1])
+    window.set_cursor_pos(cursor.x, cursor.y - text_size[1] - SPACING_LABELS)
   end
 
   # A label, but bigger
@@ -370,7 +371,7 @@ module Gui
       window.height += text_size[1]
     end
 
-    window.set_cursor_pos(cursor.x, cursor.y - text_size[1])
+    window.set_cursor_pos(cursor.x, cursor.y - text_size[1] - SPACING_LABELS)
   end
 
   def Gui.image image_path, w = 128, h = 128
