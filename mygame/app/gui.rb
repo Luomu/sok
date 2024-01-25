@@ -2,6 +2,7 @@
 module Gui
   ERR_NO_CURR_WINDOW = "No current window set - missing begin?"
   WINDOW_TINT        = [50, 60, 70]
+  SPACING_RECTS      = 8 # vertical spacing added after non-text elements
 
   # Internal data structures
   Point         = Struct.new(:x, :y)
@@ -135,10 +136,13 @@ module Gui
       cursor = get_cursor_pos()
       x = cursor.x
       y = cursor.y
-      # this part is probably wrong
+      h = h + SPACING_RECTS
+      # Extend the window rectangle if necessary
       if !has_flag?(WINDOWFLAG_FIXED_SIZE)
-        self.width  = w + 32
-        self.height = h + 32
+        right  = x  + w
+        bottom = -y + h # cursor coords go "down"
+        self.width  = self.width.greater(right)
+        self.height = self.height.greater(bottom)
       end
       cursor.y -= h
       return x, y
@@ -218,10 +222,11 @@ module Gui
       ctx.next_window_flags = nil
     end
     window.is_alive = true
-    window.x = x
-    window.y = y
+    window.x      = x
+    window.y      = y
+    window.height = ctx.padding # top only, expanded later
+    window.width  = ctx.padding # left only, expanded later
     window.num_options = 0
-    window.height = ctx.padding * 2
 
     # Override position
     if ctx.next_window_pos
@@ -246,6 +251,7 @@ module Gui
       ctx.next_window_size = nil
     end
 
+    # Where the first element will be placed (y moves down)
     window.set_cursor_pos(ctx.padding, -ctx.padding)
   end
 
@@ -253,11 +259,15 @@ module Gui
   # Returns the highlighted option index, if any
   def Gui.end_menu
     raise ERR_NO_CURR_WINDOW unless @@ctx.current_window
+    w = @@ctx.current_window
 
-    #resize menu to fit contents
+    # Add right/bottom padding
+    if !w.has_flag?(WINDOWFLAG_FIXED_SIZE)
+      w.width  += @@ctx.padding
+      w.height += @@ctx.padding
+    end
 
     # Auto-center
-    w = @@ctx.current_window
     if w.has_flag?(WINDOWFLAG_CENTER_X)
       w.x = SCREEN_HALF_W - w.width/2
     end
@@ -375,16 +385,8 @@ module Gui
   def Gui.image image_path, w = 128, h = 128
     window = @@ctx.current_window
     raise ERR_NO_CURR_WINDOW unless window
-
-    cursor = window.get_cursor_pos
-    window.draw_list.add_image(image_path, cursor.x, cursor.y - h, w, h)
-
-    if !window.has_flag?(WINDOWFLAG_FIXED_SIZE)
-      window.width  = w + 32
-      window.height = h + 32
-    end
-
-    cursor.y -= h + @@ctx.padding
+    x, y = window.allocate_rectangle(w, h)
+    window.draw_list.add_image(image_path, x, y - h, w, h)
   end
 
   # Layout element with a custom draw callback
