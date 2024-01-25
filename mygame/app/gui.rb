@@ -136,7 +136,6 @@ module Gui
       cursor = get_cursor_pos()
       x = cursor.x
       y = cursor.y
-      h = h + SPACING_RECTS
       # Extend the window rectangle if necessary
       if !has_flag?(WINDOWFLAG_FIXED_SIZE)
         right  = x  + w
@@ -144,7 +143,7 @@ module Gui
         self.width  = self.width.greater(right)
         self.height = self.height.greater(bottom)
       end
-      cursor.y -= h
+      cursor.y -= h + SPACING_RECTS
       return x, y
     end
   end
