@@ -1,6 +1,7 @@
 # immediate mode menu layout
 module Gui
   ERR_NO_CURR_WINDOW = "No current window set - missing begin?"
+  WINDOW_TINT        = [50, 60, 70]
 
   # Internal data structures
   Point         = Struct.new(:x, :y)
@@ -592,7 +593,7 @@ module Gui
     ctx = @@ctx
     ctx.windows.each do |w|
       # Gradient version
-      args.outputs.primitives << { x: w.x, y: w.y - w.height, w: w.width, h: w.height, r: 50, g: 60, b: 70, path: "sprites/gradient01.png" }.sprite!
+      args.outputs.primitives << { x: w.x, y: w.y - w.height, w: w.width, h: w.height, r: WINDOW_TINT.r, g: WINDOW_TINT.g, b: WINDOW_TINT.b, path: "sprites/gradient01.png" }.sprite!
       args.outputs.primitives << { x: w.x, y: w.y - w.height, w: w.width, h: w.height }.set_color_rgb(COLOR_DARK_GREY_P8).border!
       # Non gradient version
       #args.outputs.primitives << [w.x, w.y - w.height, w.width, w.height, COLOR_WHITE].solid
