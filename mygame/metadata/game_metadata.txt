@@ -3,7 +3,7 @@ devid=luolamies
 devtitle=Luolamies
 gameid=sok
 gametitle=Soldiers of Kolumbo
-version=0.6.4
+version=0.6.5
 icon=metadata/icon.png
 
 # === Flags available at all licensing tiers ===

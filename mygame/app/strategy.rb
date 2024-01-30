@@ -206,7 +206,22 @@ class GameState_Strategy < FsmState
     end
 
     Strategy.eventbus.publish(Events::TURN_ENDED, nil)
-    @stat_tracker.trigger_evaluation()
+
+    # Weekly evaluation
+    if @stat_tracker.week_has_passed?
+      # Calculate company ranking from reputation at the end of week,
+      # so that it doesn't fluctuate every day
+      change_data = {
+        old_rank: company.rank
+      }
+      company.rank = Rules.calculate_rank_for_reputation(company.reputation)
+      change_data.new_rank = company.rank
+
+      @stat_tracker.trigger_weekly_evaluation(change_data) # may trigger weekly evaluation
+      # Autosave at the end of a week
+      $game_events.publish(Events::AUTOSAVE, nil)
+      # Todo: for better feel, delay start turn until eval screen closed?
+    end
 
     start_new_turn(args)
     @messages.queue_message("A day has passed")
@@ -281,16 +296,6 @@ class GameState_Strategy < FsmState
 
     args.state.mission        = nil
     args.state.mission_result = nil
-
-    # Level up/down, depending on reputation
-    # This should perhaps be limited to every week/month?
-    old_rank = company.rank
-    company.rank = Rules.calculate_rank_for_reputation(company.reputation)
-    if company.rank > old_rank
-      @messages.queue_message("Our standing has increased")
-    elsif company.rank < old_rank
-      @messages.queue_message("Our standing has decreased")
-    end
 
     # Finally, autosave, if autosave has been enabled
     $game_events.publish(Events::AUTOSAVE, nil)
